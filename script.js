@@ -2,9 +2,9 @@
    Lumière Studio — script.js
 ───────────────────────────────────────────── */
 
-// ── Interactive Background Canvas with Dynamic Polka Dots ──
+// ── Interactive Background Canvas ──
 const canvas = document.getElementById('interactive-bg');
-const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let canvasWidth = window.innerWidth;
 let canvasHeight = window.innerHeight;
@@ -13,77 +13,117 @@ canvas.width = canvasWidth;
 canvas.height = canvasHeight;
 
 let polkaDots = [];
-const dotCount = prefersReducedMotion ? 0 : 60;
+// More dots, bigger, bolder
+const dotCount = prefersReducedMotion ? 0 : 90;
 let scrollVelocity = 0;
 let lastScrollY = 0;
 
-class PoljaDot {
+// Palette: mix of DARK mauve/rose tones and VERY LIGHT near-white tones for contrast
+const DOT_PALETTE = [
+  // Dark/rich tones
+  '#7a3f4a', '#9e6b75', '#6b3d47', '#c9929a', '#5c2e38',
+  // Medium tones
+  '#c9a96e', '#b87a85', '#d4b896', '#9e6b75',
+  // Very light / near-white
+  '#fde8ea', '#fff0f2', '#fdf4f0', '#ffe4e8', '#f9e0dc',
+];
+
+class PolkaDot {
   constructor() {
-    this.x = Math.random() * canvasWidth;
-    this.y = Math.random() * canvasHeight;
-    this.baseSize = Math.random() * 8 + 3;
-    this.size = this.baseSize;
-    this.speedX = (Math.random() - 0.5) * 0.3;
-    this.speedY = (Math.random() - 0.5) * 0.3;
-    this.opacity = Math.random() * 0.4 + 0.15;
-    this.baseOpacity = this.opacity;
-    this.color = ['#c9929a', '#9e6b75', '#e8b4b0', '#d4b896', '#f2d4d0'][Math.floor(Math.random() * 5)];
-    this.scale = 1;
-    this.breathingPhase = Math.random() * Math.PI * 2;
+    this.reset(true);
   }
 
-  update(mouseX, mouseY, scrollAmount) {
-    // Gentle breathing animation
-    this.breathingPhase += 0.01;
-    const breathe = Math.sin(this.breathingPhase) * 0.15 + 1;
-    
-    // Drift movement
+  reset(init = false) {
+    this.x = Math.random() * canvasWidth;
+    this.y = init ? Math.random() * canvasHeight : -100;
+    const sizeClass = Math.random();
+    if (sizeClass < 0.25)      this.baseSize = Math.random() * 40 + 55;
+    else if (sizeClass < 0.55) this.baseSize = Math.random() * 30 + 25;
+    else                       this.baseSize = Math.random() * 18 + 8;
+    this.size = this.baseSize;
+    this.speedX = (Math.random() - 0.5) * 0.18;
+    this.speedY = (Math.random() - 0.5) * 0.18;
+    const colIdx = Math.floor(Math.random() * DOT_PALETTE.length);
+    this.color = DOT_PALETTE[colIdx];
+    const isLight = colIdx >= 9;
+    this.baseOpacity = isLight ? Math.random() * 0.35 + 0.45 : Math.random() * 0.30 + 0.30;
+    this.opacity = this.baseOpacity;
+    this.scale = 1;
+    this.breathingPhase = Math.random() * Math.PI * 2;
+    this.breatheSpeed = 0.006 + Math.random() * 0.008;
+    this._grad = null;
+    this._gradR = 0;
+  }
+
+  update(mouseX, mouseY, rebuildGrad) {
+    this.breathingPhase += this.breatheSpeed;
+    const breathe = Math.sin(this.breathingPhase) * 0.12 + 1;
+
     this.x += this.speedX;
     this.y += this.speedY;
 
-    // Wrap around screen
-    if (this.x < -20) this.x = canvasWidth + 20;
-    if (this.x > canvasWidth + 20) this.x = -20;
-    if (this.y < -20) this.y = canvasHeight + 20;
-    if (this.y > canvasHeight + 20) this.y = -20;
+    if (this.x < -120) this.x = canvasWidth + 120;
+    if (this.x > canvasWidth + 120) this.x = -120;
+    if (this.y < -120) this.y = canvasHeight + 120;
+    if (this.y > canvasHeight + 120) this.y = -120;
 
-    // Distance to cursor
     const dx = mouseX - this.x;
     const dy = mouseY - this.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    
-    // Ripple effect on mouse movement
-    const interactionRadius = 200;
+    const interactionRadius = 260;
+
     if (distance < interactionRadius) {
       const strength = 1 - (distance / interactionRadius);
-      this.scale = 1 + strength * 0.6; // Scale up near cursor
-      this.opacity = this.baseOpacity + strength * 0.3;
+      this.scale = 1 + strength * 0.7;
+      this.opacity = Math.min(0.95, this.baseOpacity + strength * 0.35);
     } else {
-      this.scale = breathe; // Breathing effect when not interacting
+      this.scale = breathe;
       this.opacity = this.baseOpacity;
     }
-    
-    // Scroll-triggered ripple
-    if (Math.abs(scrollVelocity) > 0.5) {
-      const scrollEffect = Math.min(0.5, Math.abs(scrollVelocity) / 10);
-      this.scale = Math.max(this.scale, 1 + scrollEffect * 0.4);
-      this.opacity = Math.min(1, this.opacity + scrollEffect * 0.2);
+
+    if (Math.abs(scrollVelocity) > 1) {
+      const scrollEffect = Math.min(0.5, Math.abs(scrollVelocity) / 8);
+      this.scale = Math.max(this.scale, 1 + scrollEffect * 0.5);
+      this.opacity = Math.min(0.95, this.opacity + scrollEffect * 0.15);
     }
   }
 
   draw() {
-    ctx.fillStyle = this.color;
+    const r = Math.max(1, this.baseSize * this.scale);
+    
+    // Rebuild gradient if radius changed significantly or if it's null
+    // We use translate(x,y) so the gradient can be defined at (0,0)
+    if (!this._grad || Math.abs(this._gradR - r) > 1) {
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+      g.addColorStop(0,    hexToRgba(this.color, 1));
+      g.addColorStop(0.55, hexToRgba(this.color, 0.6));
+      g.addColorStop(1,    hexToRgba(this.color, 0));
+      this._grad = g;
+      this._gradR = r;
+    }
+
+    ctx.save();
+    ctx.translate(this.x, this.y);
     ctx.globalAlpha = this.opacity;
+    ctx.fillStyle = this._grad;
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.baseSize * this.scale, 0, Math.PI * 2);
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
     ctx.fill();
+    ctx.restore();
     ctx.globalAlpha = 1;
   }
 }
 
-// Initialize polka dots
+// Helper to convert hex + alpha to rgba string
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return `rgba(${r},${g},${b},${alpha.toFixed(3)})`;
+}
+
 for (let i = 0; i < dotCount; i++) {
-  polkaDots.push(new PoljaDot());
+  polkaDots.push(new PolkaDot());
 }
 
 let mouseX = 0, mouseY = 0;
@@ -91,177 +131,255 @@ let mouseX = 0, mouseY = 0;
 document.addEventListener('mousemove', (e) => {
   mouseX = e.clientX;
   mouseY = e.clientY;
-});
-
-document.addEventListener('scroll', () => {
-  const currentScrollY = window.scrollY;
-  scrollVelocity = currentScrollY - lastScrollY;
-  lastScrollY = currentScrollY;
 }, { passive: true });
 
-let rafBgId = null;
-function animateBackground() {
-  if (prefersReducedMotion) return;
-  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  polkaDots.forEach(dot => {
-    dot.update(mouseX, mouseY, scrollVelocity);
-    dot.draw();
-  });
 
-  rafBgId = requestAnimationFrame(animateBackground);
+// ── Lenis Smooth Scroll ──
+const lenis = (typeof Lenis !== 'undefined') ? new Lenis({
+  duration: 1.2,
+  easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+  smooth: true,
+  mouseMultiplier: 1,
+  smoothTouch: false,
+  touchMultiplier: 2,
+}) : null;
+
+// ── Single master RAF loop — drives Lenis + canvas ──
+let masterFrameCount = 0;
+function masterLoop(time) {
+  masterFrameCount++;
+  if (lenis) lenis.raf(time);
+
+  // and only rebuilt every 12 frames (optimized from 6) to reduce GPU pressure
+  if (!prefersReducedMotion) {
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    const rebuildGrad = masterFrameCount % 12 === 0;
+    polkaDots.forEach(dot => {
+      dot.update(mouseX, mouseY, rebuildGrad);
+      dot.draw();
+    });
+  }
+
+  requestAnimationFrame(masterLoop);
 }
-
-function startBackgroundLoop() {
-  if (prefersReducedMotion) return;
-  if (rafBgId) cancelAnimationFrame(rafBgId);
-  animateBackground();
-}
-
-function stopBackgroundLoop() {
-  if (rafBgId) cancelAnimationFrame(rafBgId);
-  rafBgId = null;
-}
-
-startBackgroundLoop();
+requestAnimationFrame(masterLoop);
 
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') stopBackgroundLoop();
-  else startBackgroundLoop();
+  if (lenis) {
+    document.visibilityState === 'hidden' ? lenis.stop() : lenis.start();
+  }
 });
+
+// Feed Lenis scroll into scrollVelocity for dot burst effect
+if (lenis) {
+  lenis.on('scroll', ({ velocity }) => {
+    scrollVelocity = velocity * 60;
+  });
+} else {
+  document.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+    scrollVelocity = currentScrollY - lastScrollY;
+    lastScrollY = currentScrollY;
+  }, { passive: true });
+}
 
 window.addEventListener('resize', () => {
   canvasWidth = window.innerWidth;
   canvasHeight = window.innerHeight;
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
-});
+  polkaDots.forEach(d => { d._grad = null; });
+}, { passive: true });
 
-// ── Custom Cursor with Petal Formation ──
+
+// ── Custom Cursor — single dot, expands on interactive elements ──
 const cursor = document.getElementById('cursor');
-const follower = document.getElementById('cursorFollower');
-let mx = 0, my = 0, fx = 0, fy = 0;
+let lastPetalTime = 0;
+let lastX = 0, lastY = 0;
+let cursorIdleTimeout;
+let isCursorVisible = true;
 
-const cursor = document.getElementById('cursor');
-const follower = document.getElementById('cursorFollower');
-let mx = 0, my = 0, fx = 0, fy = 0;
+// Detect touch/coarse pointer or reduced motion — disable custom cursor
+const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+const shouldDisableCursor = hasCoarsePointer || prefersReducedMotion;
 
-// Create petals container for cursor
-const cursorPetalsContainer = document.createElement('div');
-cursorPetalsContainer.id = 'cursor-petals';
-cursorPetalsContainer.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9997;';
-document.body.insertBefore(cursorPetalsContainer, document.body.firstChild);
-
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursor.style.left = mx + 'px';
-  cursor.style.top  = my + 'px';
+if (!shouldDisableCursor) {
+  document.addEventListener('mousemove', e => {
+    cursor.style.setProperty('--x', e.clientX + 'px');
+    cursor.style.setProperty('--y', e.clientY + 'px');
+    
+    // Show cursor if it was hidden
+    if (!isCursorVisible) {
+      cursor.style.opacity = '0.9';
+      isCursorVisible = true;
+    }
+    
+    // Clear existing idle timeout
+    clearTimeout(cursorIdleTimeout);
+    
+    const now = Date.now();
+    const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+    
+    // Refined flow: trigger by time AND distance for a smooth stream
+    if (now - lastPetalTime > 50 && dist > 12) { 
+      createPetal(e.clientX, e.clientY);
+      lastPetalTime = now;
+      lastX = e.clientX;
+      lastY = e.clientY;
+    }
+    
+    // Fade out cursor after 2 seconds of inactivity (like macOS)
+    cursorIdleTimeout = setTimeout(() => {
+      cursor.style.opacity = '0.3';
+      isCursorVisible = false;
+    }, 2000);
+  }, { passive: true });
   
-  // Create petals at cursor position randomly
-  if (Math.random() > 0.7) {
-    createCursorPetal(mx, my);
-  }
-});
+  // Show cursor on mouse enter from outside
+  document.addEventListener('mouseenter', () => {
+    cursor.style.opacity = '0.9';
+    isCursorVisible = true;
+  });
+  
+  // Hide cursor when leaving window
+  document.addEventListener('mouseleave', () => {
+    cursor.style.opacity = '0';
+    isCursorVisible = false;
+  });
+} else {
+  // Hide custom cursor on touch devices or when reduced motion is preferred
+  cursor.style.display = 'none';
+}
 
-function createCursorPetal(x, y) {
+function createPetal(x, y) {
+  if (prefersReducedMotion) return;
   const petal = document.createElement('div');
   petal.className = 'cursor-petal';
-  const size = 4 + Math.random() * 8;
-  const angle = Math.random() * Math.PI * 2;
-  const distance = 3 + Math.random() * 8;
-  const offsetX = Math.cos(angle) * distance;
-  const offsetY = Math.sin(angle) * distance;
+  const size = Math.random() * 8 + 4;
+  const colors = ['var(--blush)', 'var(--rose)', 'var(--mauve)', 'var(--gold)', 'rgba(255,255,255,0.8)'];
   
-  petal.style.cssText = `
-    position: absolute;
-    left: ${x + offsetX}px;
-    top: ${y + offsetY}px;
-    width: ${size}px;
-    height: ${size}px;
-    background: radial-gradient(circle, var(--blush), var(--rose));
-    border-radius: ${Math.random() > 0.5 ? '50% 0 50% 0' : '0 50% 0 50%'};
-    opacity: 0.7;
-    pointer-events: none;
-    animation: fallPetal ${2 + Math.random() * 2}s ease-out forwards;
-  `;
+  petal.style.width = size + 'px';
+  petal.style.height = size + 'px';
+  petal.style.background = colors[Math.floor(Math.random() * colors.length)];
+  petal.style.left = x + 'px';
+  petal.style.top = y + 'px';
   
-  cursorPetalsContainer.appendChild(petal);
+  // Random horizontal drift for organic flow
+  const drift = (Math.random() - 0.5) * 50;
+  petal.style.setProperty('--drift', drift + 'px');
+  petal.style.zIndex = '9998';
+  petal.style.animation = `fallPetal ${Math.random() * 1.5 + 1}s cubic-bezier(.2,.5,.3,1) forwards`;
   
-  setTimeout(() => petal.remove(), 4000);
+  document.body.appendChild(petal);
+  setTimeout(() => petal.remove(), 2500);
 }
 
-(function followLoop() {
-  if (prefersReducedMotion) return;
-  fx += (mx - fx) * 0.12;
-  fy += (my - fy) * 0.12;
-  follower.style.left = fx + 'px';
-  follower.style.top  = fy + 'px';
-  requestAnimationFrame(followLoop);
-})();
+// Expand dot on any interactive element (CTAs, links, buttons, cards)
+const interactiveEls = 'a, button, .pkg-tab, .testi-dot, .gallery-item, .nav-link, .service-card, .pkg-card, .contact-item, input, select, textarea';
+document.querySelectorAll(interactiveEls).forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('is-hovering'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('is-hovering'));
+});
 
-if (!prefersReducedMotion) {
-  document.querySelectorAll('a, button, .pkg-tab, .testi-dot, .gallery-item, .nav-link').forEach(el => {
-    el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2.5)'; follower.style.opacity = '0'; });
-    el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; follower.style.opacity = '1'; });
-  });
-}
 
-// ── Sticky Nav with Hide/Show on Scroll ──
+
+
+// ── Sticky Nav ──
 const nav = document.getElementById('nav');
 let lastScrollTop = 0;
 let scrollTimeout;
 
 window.addEventListener('scroll', () => {
   let currentScroll = window.scrollY;
-  
   if (currentScroll > 60) {
-    if (currentScroll > lastScrollTop) {
-      // Scrolling DOWN - hide nav
-      nav.style.transform = 'translateY(-100%)';
-    } else {
-      // Scrolling UP - show nav
-      nav.style.transform = 'translateY(0)';
-    }
+    nav.style.transform = currentScroll > lastScrollTop ? 'translateY(-100%)' : 'translateY(0)';
   } else {
     nav.style.transform = 'translateY(0)';
   }
-  
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
-  
-  // Clear existing timeout
   clearTimeout(scrollTimeout);
-  
-  // Show nav after scrolling stops
   scrollTimeout = setTimeout(() => {
-    if (currentScroll > 60) {
-      nav.style.transform = 'translateY(0)';
-    }
+    if (currentScroll > 60) nav.style.transform = 'translateY(0)';
   }, 800);
-  
   nav.classList.toggle('scrolled', currentScroll > 60);
 });
 
-// ── Mobile Menu ──
+// ── High-End Full Screen Polka Dot Menu ──
+const fsMenu = document.getElementById('fsMenu');
 const burger = document.getElementById('navBurger');
-const mobileMenu = document.getElementById('mobileMenu');
+const menuDots = document.querySelectorAll('.menu-dot');
+
 burger.addEventListener('click', () => {
-  const open = !mobileMenu.classList.contains('open');
-  mobileMenu.classList.toggle('open');
-  mobileMenu.style.display = mobileMenu.classList.contains('open') ? 'flex' : 'none';
-  burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-});
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
-    mobileMenu.classList.remove('open');
-    mobileMenu.style.display = 'none';
-    burger.setAttribute('aria-expanded', 'false');
+  const isActive = fsMenu.classList.toggle('is-active');
+  burger.classList.toggle('is-active');
+  burger.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+  
+  if (isActive) {
+    if (lenis) lenis.stop();
+    // Staggered entry for dots
+    menuDots.forEach((dot, index) => {
+      dot.style.opacity = '0';
+      dot.style.transform = 'scale(0) translateY(60px)';
+      dot.style.transition = 'all 0.8s var(--ease)';
+      setTimeout(() => {
+        dot.style.opacity = '1';
+        dot.style.transform = 'scale(1) translateY(0)';
+      }, 150 + index * 80);
+    });
+  } else {
+    if (lenis) lenis.start();
+    // Quick exit
+    menuDots.forEach(dot => {
+      dot.style.opacity = '0';
+      dot.style.transform = 'scale(0.8) translateY(-40px)';
+    });
   }
 });
-document.querySelectorAll('.mob-link').forEach(link => {
-  link.addEventListener('click', () => {
-    mobileMenu.classList.remove('open');
-    mobileMenu.style.display = 'none';
+
+// Dynamic Burger Visibility: Hide on Scroll, Show on Stop
+if (lenis) {
+  lenis.on('scroll', () => {
+    // Only apply if not already hidden by the nav-bar logic
+    burger.classList.add('nav-hidden');
+    
+    // Clear and reset the existing scrollTimeout (from line 217)
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      burger.classList.remove('nav-hidden');
+      // Also ensure the whole nav is visible if we've stopped
+      if (window.scrollY > 60) nav.style.transform = 'translateY(0)';
+    }, 450); // Snappy 450ms reveal
   });
+}
+
+// Close menu on link click, close button, or Escape
+const closeBtn = document.getElementById('fsMenuClose');
+if (closeBtn) {
+  closeBtn.addEventListener('click', () => {
+    fsMenu.classList.remove('is-active');
+    burger.classList.remove('is-active');
+    burger.setAttribute('aria-expanded', 'false');
+    if (lenis) lenis.start();
+  });
+}
+
+menuDots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    fsMenu.classList.remove('is-active');
+    burger.classList.remove('is-active');
+    burger.setAttribute('aria-expanded', 'false');
+    if (lenis) lenis.start();
+  });
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && fsMenu.classList.contains('is-active')) {
+    fsMenu.classList.remove('is-active');
+    burger.classList.remove('is-active');
+    burger.setAttribute('aria-expanded', 'false');
+    if (lenis) lenis.start();
+  }
 });
 
 // ── Hero Image Ken Burns ──
@@ -271,10 +389,9 @@ if (heroImg) {
   if (heroImg.complete) heroImg.classList.add('loaded');
 }
 
-// ── Falling Petals (Extended throughout page) ──
+// ── Falling Petals ──
 const petalsContainer = document.getElementById('petals');
 const PETAL_COUNT = 30;
-
 function createPetals() {
   if (prefersReducedMotion) return;
   for (let i = 0; i < PETAL_COUNT; i++) {
@@ -282,27 +399,24 @@ function createPetals() {
     p.className = 'petal';
     const size = 8 + Math.random() * 14;
     p.style.cssText = `
-      left: ${Math.random() * 100}%;
-      top: ${-20 - Math.random() * 100}px;
-      width: ${size}px;
-      height: ${size}px;
-      animation-duration: ${6 + Math.random() * 10}s;
-      animation-delay: ${Math.random() * 8}s;
-      opacity: ${0.4 + Math.random() * 0.5};
-      border-radius: ${Math.random() > 0.5 ? '50% 0 50% 0' : '0 50% 0 50%'};
+      left:${Math.random() * 100}%;
+      top:${-20 - Math.random() * 100}px;
+      width:${size}px;height:${size}px;
+      animation-duration:${6 + Math.random() * 10}s;
+      animation-delay:${Math.random() * 8}s;
+      opacity:${0.4 + Math.random() * 0.5};
+      border-radius:${Math.random() > 0.5 ? '50% 0 50% 0' : '0 50% 0 50%'};
     `;
     petalsContainer.appendChild(p);
   }
 }
-
 createPetals();
 
-// ── Scroll Reveal (IntersectionObserver) ──
+// ── Scroll Reveal (IntersectionObserver) — fade-up on enter, stay visible ──
 const revealEls = document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right');
 const revealObs = new IntersectionObserver((entries) => {
-  entries.forEach((entry, i) => {
+  entries.forEach((entry) => {
     if (entry.isIntersecting) {
-      // stagger siblings
       const siblings = entry.target.parentElement.querySelectorAll('.reveal-up, .reveal-left, .reveal-right');
       let delay = 0;
       siblings.forEach(sib => {
@@ -314,7 +428,7 @@ const revealObs = new IntersectionObserver((entries) => {
       revealObs.unobserve(entry.target);
     }
   });
-}, { threshold: 0.12 });
+}, { threshold: 0.10 });
 
 revealEls.forEach(el => revealObs.observe(el));
 
@@ -334,47 +448,15 @@ tabs.forEach(tab => {
       studentGrid.classList.remove('hidden');
       clientGrid.classList.add('hidden');
     }
-    // re-trigger reveal on newly visible cards
-    document.querySelectorAll('#pkgStudents .reveal-up, #pkgClients .reveal-up').forEach(el => {
+    document.querySelectorAll('#pkgStudents .reveal-up,#pkgClients .reveal-up').forEach(el => {
       el.classList.remove('visible');
       setTimeout(() => el.classList.add('visible'), 100);
     });
   });
 });
 
-// ── Testimonials Slider ──
-const track = document.getElementById('testiTrack');
-const dotsContainer = document.getElementById('testiDots');
-let currentSlide = 0;
-const cards = document.querySelectorAll('.testi-card');
-const totalSlides = Math.ceil(cards.length / 1);
-
-// Create dots
-for (let i = 0; i < cards.length; i++) {
-  const dot = document.createElement('button');
-  dot.className = 'testi-dot' + (i === 0 ? ' active' : '');
-  dot.setAttribute('aria-label', `Slide ${i + 1}`);
-  dot.addEventListener('click', () => goToSlide(i));
-  dotsContainer.appendChild(dot);
-}
-
-function goToSlide(idx) {
-  currentSlide = Math.max(0, Math.min(idx, cards.length - 1));
-  const cardWidth = cards[0].offsetWidth + 24; // gap
-  track.style.transform = `translateX(-${currentSlide * cardWidth}px)`;
-  document.querySelectorAll('.testi-dot').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
-}
-
-// Auto-advance
-setInterval(() => goToSlide((currentSlide + 1) % cards.length), 4500);
-
-// Touch swipe
-let startX = 0;
-track.addEventListener('touchstart', e => startX = e.touches[0].clientX, { passive: true });
-track.addEventListener('touchend', e => {
-  const diff = startX - e.changedTouches[0].clientX;
-  if (Math.abs(diff) > 50) goToSlide(currentSlide + (diff > 0 ? 1 : -1));
-});
+// ── Testimonials Marquee (Handled via CSS) ──
+// Obsolete JS removed to prevent conflict with CSS marquee animation.
 
 // ── Contact Form ──
 const form = document.getElementById('contactForm');
@@ -394,7 +476,7 @@ form.addEventListener('submit', e => {
   }, 1200);
 });
 
-// ── Smooth active nav link ──
+// ── Active Nav Link ──
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-link');
 const linkObs = new IntersectionObserver((entries) => {
@@ -409,139 +491,137 @@ const linkObs = new IntersectionObserver((entries) => {
 
 sections.forEach(s => linkObs.observe(s));
 
-// ── High-end scroll effects engine (fade/zoom/parallax + premium blur) ──
-(function initScrollEffects() {
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// ── Section Fade-In on Scroll (sections fade up as they enter viewport, stay visible) ──
+(function initSectionReveal() {
+  if (prefersReducedMotion) return;
 
-  const els = Array.from(document.querySelectorAll('[data-scroll]'));
+  // These are the full sections with data-scroll data-effect="fade"
+  const fadeSections = document.querySelectorAll('section[data-scroll][data-effect="fade"]');
+
+  // Set initial state: hidden below
+  fadeSections.forEach(sec => {
+    if (sec.id === 'hero') return; // hero is always visible
+    sec.style.opacity = '0';
+    sec.style.transform = 'translateY(48px)';
+    sec.style.transition = 'opacity 0.85s cubic-bezier(.4,0,.2,1), transform 0.85s cubic-bezier(.4,0,.2,1)';
+  });
+
+  const sectionObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        sectionObs.unobserve(entry.target); // stay visible once revealed
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  fadeSections.forEach(sec => {
+    if (sec.id !== 'hero') sectionObs.observe(sec);
+  });
+})();
+
+// ── Inner element parallax / subtle scroll effects (only for non-section elements) ──
+(function initScrollEffects() {
+  if (prefersReducedMotion) return;
+
+  // Only apply to inner elements that have data-scroll but are NOT section-level fade containers
+  const els = Array.from(document.querySelectorAll('[data-scroll]')).filter(el => {
+    // Exclude the full section elements (they are handled by initSectionReveal)
+    return el.tagName.toLowerCase() !== 'section';
+  });
+
   if (!els.length) return;
 
   const vh = () => window.innerHeight;
-  const vCenter = () => vh() * 0.5;
-
-  // Set initial states
-  if (!prefersReduced) {
-    els.forEach(el => {
-      const effect = el.dataset.scroll || 'fade';
-      const baseOpacity = el.dataset.baseOpacity;
-      const initialTransform = el.dataset.initialTransform;
-
-      if ((effect.startsWith('fade') || effect === 'fade') && baseOpacity != null) {
-        el.style.opacity = baseOpacity;
-      }
-      if (initialTransform) {
-        el.style.transform = initialTransform;
-      }
-    });
-  }
 
   let rafId = null;
   const tick = () => {
     rafId = null;
-
     const viewH = vh();
-    const center = vCenter();
+    const center = viewH * 0.5;
 
     els.forEach(el => {
-      if (prefersReduced) {
-        el.style.opacity = '1';
-        el.style.transform = 'none';
-        el.style.filter = 'none';
-        return;
-      }
-
-      const effect = el.dataset.scroll || 'fade';
+      const effect = el.dataset.effect || el.dataset.scroll || 'fade';
       const intensity = parseFloat(el.dataset.intensity || '1');
       const depth = parseFloat(el.dataset.depth || '1');
       const blur = parseFloat(el.dataset.blur || '0');
       const rotate = parseFloat(el.dataset.rotate || '0');
 
-      const outFade = el.dataset.outFade !== 'false';
-
       const rect = el.getBoundingClientRect();
       const elCenter = rect.top + rect.height * 0.5;
-      const dist = (elCenter - center) / (viewH * 0.55); // ~ -1..1
+      const dist = (elCenter - center) / (viewH * 0.55);
 
-      // 0..1 visibility: 1 near center, 0 when far away
+      // Raw visibility 0..1
       const visibilityRaw = 1 - Math.min(1, Math.max(0, Math.abs(dist)));
-
-      // entry/exit window tuning
       const enterZone = parseFloat(el.dataset.enterZone || '0.85');
       const exitZone = parseFloat(el.dataset.exitZone || '0.15');
-      let visibility = visibilityRaw;
-      visibility = (visibility - exitZone) / (enterZone - exitZone);
+      let visibility = (visibilityRaw - exitZone) / (enterZone - exitZone);
       visibility = Math.min(1, Math.max(0, visibility));
+      const eased = visibility * visibility * (3 - 2 * visibility);
 
-      const eased = visibility * visibility * (3 - 2 * visibility); // smoothstep
-
-      // Opacity
-      const baseOpacity = parseFloat(el.dataset.baseOpacity || '0');
-      const maxOpacity = parseFloat(el.dataset.maxOpacity || '1');
-
-      let alpha;
-      if (effect.startsWith('fade')) {
-        alpha = baseOpacity + (maxOpacity - baseOpacity) * eased;
-      } else {
-        alpha = 0.25 + 0.75 * eased;
+      // Only fade in from bottom, never fade out once visible
+      // Track if element has already been shown
+      if (!el._revealed) {
+        const baseOpacity = parseFloat(el.dataset.baseOpacity || '0');
+        const maxOpacity = parseFloat(el.dataset.maxOpacity || '1');
+        const alpha = baseOpacity + (maxOpacity - baseOpacity) * eased;
+        el.style.opacity = String(alpha);
+        
+        // Staggered reveal logic: don't mark as revealed until it's very clear
+        if (eased >= 0.99) el._revealed = true;
       }
-
-      if (outFade) {
-        const leave = Math.min(1, Math.max(0, (Math.abs(dist) - 0.2) / 0.9));
-        alpha = alpha * (1 - leave * 0.85);
-      }
-      el.style.opacity = String(alpha);
-
-      // Transform
-      let tx = parseFloat(el.dataset.x || '0');
-      let ty = parseFloat(el.dataset.y || '0');
 
       let translateX = 0;
       let translateY = 0;
-      let scale = parseFloat(el.dataset.scale || '1');
+      let scale = 1;
       let rot = 0;
       let blurPx = 0;
 
-      if (effect === 'parallax' || effect === 'image-parallax') {
-        translateY = (-dist * 18 * intensity * depth) + ty;
-        translateX = (dist * 6 * intensity * depth) + tx;
-        scale = 1 + (1 - eased) * 0.06 * intensity;
-        rot = rotate * (1 - eased) * 0.15;
-        blurPx = blur * (1 - eased);
-      } else if (effect === 'zoom') {
-        translateY = ty;
-        translateX = tx;
-        scale = 1 + (1 - eased) * 0.14 * intensity * depth;
-        rot = rotate * (1 - eased);
+      if (effect === 'image-parallax') {
+        // True parallax: move the internal image, not the container
+        const img = el.querySelector('img');
+        if (img) {
+          const imgTranslateY = (-dist * 35 * intensity * depth);
+          const imgScale = 1.1 + (Math.abs(dist) * 0.1); 
+          img.style.transform = `translate3d(0, ${imgTranslateY}px, 0) scale(${imgScale})`;
+        }
+        // Container entrance animation
+        if (!el._revealed) {
+          translateY = (1 - eased) * 40 * intensity;
+        }
+      } else if (effect === 'parallax') {
+        translateY = (-dist * 16 * intensity * depth);
+        translateX = (dist * 4 * intensity * depth);
+        scale = 1 + (1 - eased) * 0.05 * intensity;
+        rot = rotate * (1 - eased) * 0.1;
         blurPx = blur * (1 - eased);
       } else if (effect === 'fade-up') {
-        translateY = (1 - eased) * 44 * intensity + ty;
-        translateX = (1 - eased) * -8 * intensity + tx;
-        scale = 1 + (1 - eased) * 0.03 * intensity;
-        rot = rotate * (1 - eased);
-        blurPx = blur * (1 - eased);
-      } else if (effect === 'fade-down') {
-        translateY = -(1 - eased) * 44 * intensity + ty;
-        translateX = (1 - eased) * 8 * intensity + tx;
-        scale = 1 + (1 - eased) * 0.03 * intensity;
-        rot = rotate * (1 - eased);
-        blurPx = blur * (1 - eased);
+        if (!el._revealed) {
+          translateY = (1 - eased) * 38 * intensity;
+        }
+        scale = 1 + (1 - eased) * 0.02 * intensity;
       } else if (effect === 'fade') {
-        translateY = (1 - eased) * 22 * intensity + ty;
-        translateX = (1 - eased) * tx;
-        scale = parseFloat(el.dataset.scale || '1') + (1 - eased) * 0.03 * intensity;
-        rot = rotate * (1 - eased);
-        blurPx = blur * (1 - eased);
-      } else {
-        // generic reveal
-        translateY = (1 - eased) * 36 * intensity + ty;
-        translateX = (1 - eased) * 10 * intensity + tx;
-        scale = 1 + (1 - eased) * 0.06 * intensity;
-        rot = rotate * (1 - eased);
-        blurPx = blur * (1 - eased);
+        if (!el._revealed) {
+          translateY = (1 - eased) * 18 * intensity;
+        }
       }
 
-      el.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) rotate(${rot}deg) scale(${scale})`;
-      el.style.filter = blurPx > 0.01 ? `blur(${Math.min(12, blurPx)}px)` : 'none';
+      // Apply container transform (excluding image-parallax which moves its own image)
+      if (effect !== 'image-parallax') {
+        if (!el._revealed || effect === 'parallax') {
+          el.style.transform = `translate3d(${translateX}px,${translateY}px,0) rotate(${rot}deg) scale(${scale})`;
+        }
+      } else {
+        // For image-parallax, only apply the entrance transform to container
+        if (!el._revealed) {
+          el.style.transform = `translate3d(0,${translateY}px,0)`;
+        } else {
+          el.style.transform = 'none';
+        }
+      }
+
+      el.style.filter = blurPx > 0.01 ? `blur(${Math.min(10, blurPx)}px)` : 'none';
     });
   };
 
@@ -560,36 +640,27 @@ sections.forEach(s => linkObs.observe(s));
   const galleryItems = document.querySelectorAll('.gallery-item[data-parallax]');
   if (!galleryItems.length) return;
 
-  const preferredReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const captionObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-      }
+      if (entry.isIntersecting) entry.target.classList.add('is-visible');
     });
-  }, { threshold: 0.25 });
+  }, { threshold: 0.2 });
 
   galleryItems.forEach(item => captionObserver.observe(item));
 
   let galleryFrameId = null;
-
   const updateGalleryParallax = () => {
     galleryFrameId = null;
-    if (preferredReducedMotion) return;
-
     const viewportCenter = window.innerHeight * 0.5;
-
     galleryItems.forEach(item => {
       const img = item.querySelector('.gallery-img');
       if (!img) return;
-
       const rect = item.getBoundingClientRect();
       const itemCenter = rect.top + rect.height * 0.5;
       const distanceFromCenter = (itemCenter - viewportCenter) / window.innerHeight;
       const parallaxFactor = parseFloat(item.dataset.parallax) || 0.1;
-      const translateY = Math.max(-36, Math.min(36, -distanceFromCenter * 72 * parallaxFactor));
-
-      img.style.transform = `translate3d(0, ${translateY}px, 0) scale(1.1)`;
+      const translateY = Math.max(-32, Math.min(32, -distanceFromCenter * 64 * parallaxFactor));
+      img.style.transform = `translate3d(0,${translateY}px,0) scale(1.1)`;
     });
   };
 
@@ -602,4 +673,3 @@ sections.forEach(s => linkObs.observe(s));
   window.addEventListener('resize', requestGalleryUpdate);
   requestGalleryUpdate();
 })();
-

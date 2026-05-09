@@ -1,15 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lumière Studio — Luxury Beauty & Artistry</title>
-  <meta name="description" content="Lumière Studio — Where beauty becomes art. Premium makeup, makeovers, transformative coaching and training packages by master artist Sophia Laurent." />
+  <meta name="description"
+    content="Lumière Studio — Where beauty becomes art. Premium makeup, makeovers, transformative coaching and training packages by master artist Sophia Laurent." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&family=Great+Vibes&display=swap" rel="stylesheet" />
+  <!-- Fonts with display=swap to avoid render blocking -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&family=Great+Vibes&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <!-- Lenis smooth scroll -->
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
 </head>
+
 <body>
 
   <!-- Interactive Background -->
@@ -17,47 +25,49 @@
 
   <!-- Custom Cursor -->
   <div class="cursor" id="cursor"></div>
-  <div class="cursor-follower" id="cursorFollower"></div>
 
-  <!-- Navigation -->
   <nav class="nav" id="nav">
     <div class="nav-logo">
       <span class="logo-script">Lumière</span>
       <span class="logo-sub">STUDIO</span>
     </div>
-      <ul class="nav-links" id="navLinks" role="navigation" aria-label="Primary">
-      <li><a href="#about" class="nav-link">About</a></li>
-      <li><a href="#services" class="nav-link">Services</a></li>
-      <li><a href="#packages" class="nav-link">Packages</a></li>
-      <li><a href="#academy" class="nav-link">Academy</a></li>
-      <li><a href="#gallery" class="nav-link">Gallery</a></li>
-      <li><a href="#contact" class="nav-link">Contact</a></li>
-    </ul>
-    <a href="#contact" class="nav-cta">Book Now</a>
-    <button class="nav-burger" id="navBurger" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
+
+    <button class="nav-burger" id="navBurger" aria-label="Menu" aria-expanded="false" aria-controls="fsMenu">
       <span></span><span></span><span></span>
     </button>
+
+    <div class="nav-actions">
+      <a href="#contact" class="nav-cta">Book Now</a>
+    </div>
   </nav>
 
-  <!-- Mobile Menu -->
-  <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Mobile navigation">
-    <ul>
-      <li><a href="#about" class="mob-link">About</a></li>
-      <li><a href="#services" class="mob-link">Services</a></li>
-      <li><a href="#packages" class="mob-link">Packages</a></li>
-      <li><a href="#academy" class="mob-link">Academy</a></li>
-      <li><a href="#gallery" class="mob-link">Gallery</a></li>
-      <li><a href="#contact" class="mob-link">Contact</a></li>
-    </ul>
+  <div class="fs-menu" id="fsMenu">
+    <button class="fs-menu-close" id="fsMenuClose" aria-label="Close Menu">✕</button>
+    <div class="fs-menu-bg">
+      <div class="bg-dot bg-dot-1"></div>
+      <div class="bg-dot bg-dot-2"></div>
+      <div class="bg-dot bg-dot-3"></div>
+      <div class="bg-dot bg-dot-4"></div>
+    </div>
+    <div class="menu-dot-grid">
+      <a href="#about" class="menu-dot dot-mauve"><span>About</span></a>
+      <a href="#services" class="menu-dot dot-gold"><span>Services</span></a>
+      <a href="#packages" class="menu-dot dot-rose"><span>Packages</span></a>
+      <a href="#academy" class="menu-dot dot-champagne"><span>Academy</span></a>
+      <a href="#gallery" class="menu-dot dot-slate"><span>Gallery</span></a>
+      <a href="#contact" class="menu-dot dot-dusty"><span>Contact</span></a>
+    </div>
   </div>
 
   <!-- ─── HERO ─── -->
-  <section class="hero" id="hero">
+  <section class="hero" id="hero" data-scroll data-effect="fade" data-base-opacity="1" data-max-opacity="1"
+    data-enter-zone="0.9" data-exit-zone="0.1">
     <div class="hero-bg">
       <img src="salon_hero.png" alt="Lumière Studio interior" class="hero-img" fetchpriority="high" decoding="async" />
       <div class="hero-overlay"></div>
     </div>
-    <div class="hero-petals" id="petals" aria-hidden="true" data-scroll data-effect="parallax" data-intensity="0.35" data-depth="0.2"></div>
+    <div class="hero-petals" id="petals" aria-hidden="true" data-scroll data-effect="parallax" data-intensity="0.35"
+      data-depth="0.2"></div>
     <div class="hero-content">
       <p class="hero-eyebrow reveal-up" data-scroll data-intensity="1.1" data-depth="1">Premium Beauty Studio</p>
       <h1 class="hero-title reveal-up" data-scroll data-effect="fade-up" data-intensity="1.2" data-depth="1">
@@ -65,8 +75,10 @@
         <span class="gradient-text"><em>Becomes Art</em></span>
       </h1>
       <div class="hero-actions reveal-up" data-scroll data-effect="fade-up" data-intensity="1" data-depth="1">
-        <a href="#services" class="btn-primary" data-scroll data-effect="zoom" data-intensity="0.6" data-depth="0.9">Explore Services</a>
-        <a href="#packages" class="btn-packages" data-scroll data-effect="zoom" data-intensity="0.6" data-depth="0.9">View Packages</a>
+        <a href="#services" class="btn-primary" data-scroll data-effect="zoom" data-intensity="0.6"
+          data-depth="0.9">Explore Services</a>
+        <a href="#packages" class="btn-packages" data-scroll data-effect="zoom" data-intensity="0.6"
+          data-depth="0.9">View Packages</a>
       </div>
     </div>
   </section>
@@ -93,113 +105,119 @@
     </div>
   </div>
 
-  <!-- ─── ABOUT ─── -->
-  <section class="about" id="about">
-    <div class="about-inner container">
-      <div class="about-image-wrap reveal-left" data-scroll data-effect="parallax" data-intensity="0.8" data-depth="1.1">
-        <img src="makeover_portrait.png" alt="Sophia Laurent - Master Artist" class="about-img" loading="lazy" decoding="async" />
-        <div class="about-img-badge" data-scroll data-effect="zoom" data-intensity="0.6" data-depth="0.9">
-          <span class="badge-num">12+</span>
-          <span class="badge-text">Years of Artistry</span>
-        </div>
+  <!-- ─── ABOUT (Redesigned Editorial Split) ─── -->
+  <section class="about" id="about" data-scroll data-effect="fade" data-base-opacity="1" data-max-opacity="1">
+    <div class="about-split">
+      <div class="about-content" data-scroll data-effect="fade-up" data-intensity="0.8">
+        <p class="about-eyebrow">Professional Development</p>
+        <h2 class="about-heading">Meeting <em>Sophia</em><br />Laurent</h2>
+        <p class="about-desc">A master makeup artist, certified beauty coach, and the creative force behind Lumière
+          Studio. Sophia has graced international runways and styled brides across three continents.</p>
+        <p class="about-desc">Her philosophy is simple — every face is a canvas, and every woman deserves to see herself
+          luminous.</p>
+        <a href="#services" class="btn-minimal">Discover Artistry</a>
       </div>
-      <div class="about-text reveal-right" data-scroll data-effect="fade-up" data-intensity="0.9" data-depth="1">
-        <p class="section-label" data-scroll data-effect="fade-up" data-intensity="0.6" data-depth="0.9">Our Story</p>
-        <h2 class="section-title" data-scroll data-effect="fade-up" data-intensity="1" data-depth="1">Meet <em>Sophia</em><br />Laurent</h2>
-        <p class="about-desc" data-scroll data-effect="fade" data-intensity="0.8" data-depth="1">A master makeup artist, certified beauty coach, and the creative force behind Lumière Studio. Sophia has graced international runways, styled brides across three continents, and mentored hundreds of aspiring artists who now lead their own successful studios.</p>
-        <p class="about-desc" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">Her philosophy is simple — every face is a canvas, and every woman deserves to see herself luminous.</p>
-        <div class="about-stats" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="0.9">
-          <div class="stat">
-            <span class="stat-num">1,400+</span>
-            <span class="stat-label">Happy Clients</span>
-          </div>
-          <div class="stat">
-            <span class="stat-num">350+</span>
-            <span class="stat-label">Students Trained</span>
-          </div>
-          <div class="stat">
-            <span class="stat-num">28</span>
-            <span class="stat-label">Awards Won</span>
-          </div>
+      <div class="about-visual" data-scroll data-effect="parallax" data-intensity="0.15">
+        <div class="about-curve-wrap">
+          <img src="makeover_portrait.png" alt="Sophia Laurent" class="about-main-img" loading="lazy" decoding="async"
+            width="600" height="800" />
         </div>
-        <a href="#services" class="btn-primary">Discover My Work</a>
       </div>
     </div>
   </section>
 
   <!-- ─── SERVICES ─── -->
-  <section class="services" id="services">
+  <section class="services" id="services" data-scroll data-effect="fade" data-base-opacity="0" data-max-opacity="1"
+    data-enter-zone="0.85" data-exit-zone="0.15">
     <div class="container">
       <div class="section-header centered" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="0.8">
-        <p class="section-label reveal-up" data-scroll data-effect="fade-up" data-intensity="0.6" data-depth="0.7">What We Offer</p>
-        <h2 class="section-title reveal-up" data-scroll data-effect="fade-up" data-intensity="1" data-depth="1">Our Signature Services</h2>
-        <p class="section-sub reveal-up" data-scroll data-effect="fade" data-intensity="0.7" data-depth="0.8">Each service is a curated experience — intimate, intentional, and unforgettable.</p>
+        <p class="section-label reveal-up" data-scroll data-effect="fade-up" data-intensity="0.6" data-depth="0.7">What
+          We Offer</p>
+        <h2 class="section-title reveal-up" data-scroll data-effect="fade-up" data-intensity="1" data-depth="1">Our
+          Signature Services</h2>
+        <p class="section-sub reveal-up" data-scroll data-effect="fade" data-intensity="0.7" data-depth="0.8">Each
+          service is a curated experience — intimate, intentional, and unforgettable.</p>
       </div>
-        <div class="services-grid" data-scroll data-effect="fade" data-intensity="0.55" data-depth="0.7">
+      <div class="services-grid" data-scroll data-effect="fade" data-intensity="0.55" data-depth="0.7">
 
-        <div class="service-card reveal-up" id="svc-makeup" data-scroll data-effect="fade-up" data-intensity="0.85" data-depth="0.9">
-          <div class="svc-icon" data-scroll data-effect="zoom" data-intensity="0.55" data-depth="0.8">✿</div>
-          <h3 class="svc-title" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="0.9">Makeup Artistry</h3>
-          <p class="svc-desc" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">From dewy no-makeup looks to full couture glamour — tailored entirely to your features, skin tone, and vision.</p>
-          <ul class="svc-list" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
-            <li>Bridal & Engagement</li>
-            <li>Event & Party Glam</li>
-            <li>Editorial & Photoshoot</li>
-            <li>Everyday Glow</li>
-          </ul>
-          <a href="#packages" class="svc-link" data-scroll data-effect="zoom" data-intensity="0.45" data-depth="0.7">See Packages →</a>
-        </div>
-
-        <div class="service-card reveal-up" id="svc-makeover" data-scroll data-effect="fade-up" data-intensity="0.75" data-depth="0.8">
-          <div class="svc-img-wrap" data-scroll data-effect="parallax" data-intensity="0.8" data-depth="1">
-            <img src="makeup_flatlay.png" alt="Makeup flatlay" class="svc-img" loading="lazy" decoding="async" />
+        <!-- Row 1: Three individual boxes -->
+        <div class="service-card reveal-up" id="svc-makeup" data-scroll data-effect="fade-up" data-intensity="0.85">
+          <div class="svc-window">
+            <img src="makeup_flatlay.png" alt="Makeup Artistry" loading="lazy" decoding="async" width="400"
+              height="500" />
+          </div>
+          <div class="svc-content">
+            <div class="svc-icon">✿</div>
+            <h3 class="svc-title">Makeup Artistry</h3>
+            <p class="svc-desc">From dewy no-makeup looks to full couture glamour — tailored entirely to your features.
+            </p>
+            <ul class="svc-list">
+              <li>Bridal & Engagement</li>
+              <li>Event & Party Glam</li>
+              <li>Editorial & Photoshoot</li>
+            </ul>
+            <a href="#packages" class="svc-link">See Packages →</a>
           </div>
         </div>
 
-        <div class="service-card reveal-up" id="svc-makeover2" data-scroll data-effect="fade-up" data-intensity="0.8" data-depth="0.9">
-          <div class="svc-icon" data-scroll data-effect="zoom" data-intensity="0.5" data-depth="0.8">◈</div>
-          <h3 class="svc-title" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="0.9">Full Makeover</h3>
-          <p class="svc-desc" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">A holistic transformation — hair styling, skin prep, brow design, and a complete makeup look curated just for you.</p>
-          <ul class="svc-list" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
-            <li>Complete Look Design</li>
-            <li>Hair & Brow Styling</li>
-            <li>Before & After Photos</li>
-            <li>Look Replication Guide</li>
-          </ul>
-          <a href="#packages" class="svc-link" data-scroll data-effect="zoom" data-intensity="0.45" data-depth="0.7">See Packages →</a>
-        </div>
-
-        <div class="service-card service-card--dark reveal-up" id="svc-coaching" data-scroll data-effect="fade-up" data-intensity="0.8" data-depth="0.9">
-          <div class="svc-icon" data-scroll data-effect="zoom" data-intensity="0.5" data-depth="0.8">❋</div>
-          <h3 class="svc-title" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="0.9">1-on-1 Coaching</h3>
-          <p class="svc-desc" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">Private beauty coaching sessions designed to help you master your craft, launch your brand, or simply glow up your everyday look.</p>
-          <ul class="svc-list" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
-            <li>Skill Assessment</li>
-            <li>Personalised Curriculum</li>
-            <li>Business Mentoring</li>
-            <li>Ongoing Support</li>
-          </ul>
-          <a href="#packages" class="svc-link" data-scroll data-effect="zoom" data-intensity="0.45" data-depth="0.7">See Packages →</a>
-        </div>
-
-        <div class="service-card service-card--img reveal-up" id="svc-training-img" data-scroll data-effect="fade-up" data-intensity="0.8" data-depth="0.9">
-          <img src="training_coaching.png" alt="Training session" class="svc-img-full" loading="lazy" decoding="async" />
-          <div class="svc-img-overlay" data-scroll data-effect="zoom" data-intensity="0.7" data-depth="0.9">
-            <span data-scroll data-effect="fade-up" data-intensity="0.6" data-depth="1">Lumière Academy</span>
+        <div class="service-card service-card--dark reveal-up" id="svc-coaching" data-scroll data-effect="fade-up"
+          data-intensity="0.8">
+          <div class="svc-window">
+            <img src="training_coaching.png" alt="Coaching" loading="lazy" decoding="async" width="400" height="500" />
+          </div>
+          <div class="svc-content">
+            <div class="svc-icon">❋</div>
+            <h3 class="svc-title">1-on-1 Coaching</h3>
+            <p class="svc-desc">Private beauty coaching sessions designed to help you master your craft or launch your
+              brand.</p>
+            <ul class="svc-list">
+              <li>Skill Assessment</li>
+              <li>Business Mentoring</li>
+              <li>Ongoing Support</li>
+            </ul>
+            <a href="#packages" class="svc-link">See Packages →</a>
           </div>
         </div>
 
-        <div class="service-card reveal-up" id="svc-skincare" data-scroll data-effect="fade-up" data-intensity="0.8" data-depth="0.9">
-          <div class="svc-icon" data-scroll data-effect="zoom" data-intensity="0.5" data-depth="0.8">✧</div>
-          <h3 class="svc-title" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="0.9">Skin Consultation</h3>
-          <p class="svc-desc" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">Your skin is the canvas. Our in-depth skin analysis and prep session ensures a flawless, long-lasting base every time.</p>
-          <ul class="svc-list" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
-            <li>Skin Type Analysis</li>
-            <li>Custom Skincare Ritual</li>
-            <li>Product Recommendations</li>
-            <li>Pre-event Prep</li>
-          </ul>
-          <a href="#packages" class="svc-link" data-scroll data-effect="zoom" data-intensity="0.45" data-depth="0.7">See Packages →</a>
+        <div class="service-card reveal-up" id="svc-skincare" data-scroll data-effect="fade-up" data-intensity="0.8">
+          <div class="svc-window">
+            <img src="packages_bg.png" alt="Skincare" loading="lazy" decoding="async" width="400" height="500" />
+          </div>
+          <div class="svc-content">
+            <div class="svc-icon">✧</div>
+            <h3 class="svc-title">Skin Consultation</h3>
+            <p class="svc-desc">Your skin is the canvas. Our in-depth skin analysis ensures a flawless, long-lasting
+              base.</p>
+            <ul class="svc-list">
+              <li>Skin Type Analysis</li>
+              <li>Custom Skincare Ritual</li>
+              <li>Product Recommendations</li>
+            </ul>
+            <a href="#packages" class="svc-link">See Packages →</a>
+          </div>
+        </div>
+
+        <!-- Row 2: One wide box -->
+        <div class="service-card service-card--wide reveal-up" id="svc-makeover" data-scroll data-effect="fade-up"
+          data-intensity="0.75">
+          <div class="svc-window">
+            <img src="makeover_portrait.png" alt="Full Makeover" loading="lazy" decoding="async" width="800"
+              height="600" />
+          </div>
+          <div class="svc-content">
+            <div class="svc-icon">◈</div>
+            <h3 class="svc-title">Full Makeover</h3>
+            <p class="svc-desc">A holistic transformation — hair styling, skin prep, and a complete makeup look curated
+              just for you. This is our most comprehensive experience, designed for those who want the ultimate Lumière
+              glow.</p>
+            <ul class="svc-list">
+              <li>Complete Look Design</li>
+              <li>Hair & Brow Styling</li>
+              <li>Before & After Photos</li>
+              <li>Personalised Lookbook</li>
+            </ul>
+            <a href="#packages" class="svc-link">See Packages →</a>
+          </div>
         </div>
 
       </div>
@@ -207,7 +225,8 @@
   </section>
 
   <!-- ─── PACKAGES ─── -->
-  <section class="packages" id="packages">
+  <section class="packages" id="packages" data-scroll data-effect="fade" data-base-opacity="0" data-max-opacity="1"
+    data-enter-zone="0.85" data-exit-zone="0.15">
     <div class="pkg-bg">
       <img src="packages_bg.png" alt="" class="pkg-bg-img" />
       <div class="pkg-bg-overlay"></div>
@@ -221,8 +240,10 @@
 
 
       <div class="pkg-tabs reveal-up" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="0.9">
-        <button class="pkg-tab active" data-tab="clients" id="tab-clients" data-scroll data-effect="zoom" data-intensity="0.55" data-depth="0.85">For Clients</button>
-        <button class="pkg-tab" data-tab="students" id="tab-students" data-scroll data-effect="zoom" data-intensity="0.55" data-depth="0.85">For Students</button>
+        <button class="pkg-tab active" data-tab="clients" id="tab-clients" data-scroll data-effect="zoom"
+          data-intensity="0.55" data-depth="0.85">For Clients</button>
+        <button class="pkg-tab" data-tab="students" id="tab-students" data-scroll data-effect="zoom"
+          data-intensity="0.55" data-depth="0.85">For Students</button>
       </div>
 
       <div class="pkg-grid" id="pkgClients">
@@ -231,7 +252,8 @@
           <div class="pkg-tag" data-scroll data-effect="zoom" data-intensity="0.45" data-depth="0.8">Most Loved</div>
           <p class="pkg-tier" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="0.9">Éclat</p>
           <div class="pkg-price" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">₹4,999</div>
-          <p class="pkg-desc" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">The perfect glow-up. Our signature everyday makeover.</p>
+          <p class="pkg-desc" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">The perfect glow-up.
+            Our signature everyday makeover.</p>
           <ul class="pkg-features" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
             <li>Full face makeup</li>
             <li>Skin prep & base</li>
@@ -242,11 +264,14 @@
           <a href="#contact" class="btn-primary">Book Now</a>
         </div>
 
-        <div class="pkg-card pkg-card--featured reveal-up" data-scroll data-effect="zoom" data-intensity="0.7" data-depth="1">
-          <div class="pkg-tag pkg-tag--gold" data-scroll data-effect="zoom" data-intensity="0.5" data-depth="0.9">Signature</div>
+        <div class="pkg-card pkg-card--featured reveal-up" data-scroll data-effect="zoom" data-intensity="0.7"
+          data-depth="1">
+          <div class="pkg-tag pkg-tag--gold" data-scroll data-effect="zoom" data-intensity="0.5" data-depth="0.9">
+            Signature</div>
           <p class="pkg-tier" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="1">Lumière</p>
           <div class="pkg-price" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">₹9,999</div>
-          <p class="pkg-desc" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">The full Lumière experience — glamour elevated.</p>
+          <p class="pkg-desc" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">The full Lumière
+            experience — glamour elevated.</p>
           <ul class="pkg-features" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
             <li>Full glam makeup</li>
             <li>Hair styling session</li>
@@ -262,7 +287,8 @@
           <div class="pkg-tag" data-scroll data-effect="zoom" data-intensity="0.45" data-depth="0.8">Royal</div>
           <p class="pkg-tier" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="0.9">Bridal Atelier</p>
           <div class="pkg-price" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">₹24,999</div>
-          <p class="pkg-desc" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">Your dream bridal look, flawlessly executed.</p>
+          <p class="pkg-desc" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">Your dream bridal look,
+            flawlessly executed.</p>
           <ul class="pkg-features" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
             <li>Trial + wedding day look</li>
             <li>Full bridal hair styling</li>
@@ -282,7 +308,8 @@
           <div class="pkg-tag" data-scroll data-effect="zoom" data-intensity="0.45" data-depth="0.8">Beginners</div>
           <p class="pkg-tier" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="0.9">Bloom</p>
           <div class="pkg-price" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">₹7,999</div>
-          <p class="pkg-desc" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">Your first step into the world of beauty artistry.</p>
+          <p class="pkg-desc" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">Your first step into
+            the world of beauty artistry.</p>
           <ul class="pkg-features" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
             <li>4 guided sessions</li>
             <li>Basic techniques</li>
@@ -293,11 +320,14 @@
           <a href="#contact" class="btn-primary">Enrol Now</a>
         </div>
 
-        <div class="pkg-card pkg-card--featured reveal-up" data-scroll data-effect="zoom" data-intensity="0.75" data-depth="1">
-          <div class="pkg-tag pkg-tag--gold" data-scroll data-effect="zoom" data-intensity="0.5" data-depth="0.9">Most Popular</div>
+        <div class="pkg-card pkg-card--featured reveal-up" data-scroll data-effect="zoom" data-intensity="0.75"
+          data-depth="1">
+          <div class="pkg-tag pkg-tag--gold" data-scroll data-effect="zoom" data-intensity="0.5" data-depth="0.9">Most
+            Popular</div>
           <p class="pkg-tier" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="1">Artiste</p>
           <div class="pkg-price" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">₹19,999</div>
-          <p class="pkg-desc" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">The complete professional transformation course.</p>
+          <p class="pkg-desc" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">The complete
+            professional transformation course.</p>
           <ul class="pkg-features" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
             <li>10 intensive sessions</li>
             <li>Bridal, glam & editorial</li>
@@ -313,7 +343,8 @@
           <div class="pkg-tag" data-scroll data-effect="zoom" data-intensity="0.45" data-depth="0.8">Elite</div>
           <p class="pkg-tier" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="0.9">Maître</p>
           <div class="pkg-price" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">₹39,999</div>
-          <p class="pkg-desc" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">For artists ready to become masters — the full immersion.</p>
+          <p class="pkg-desc" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">For artists ready to
+            become masters — the full immersion.</p>
           <ul class="pkg-features" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
             <li>20 master sessions</li>
             <li>Advanced SFX & airbrush</li>
@@ -330,13 +361,19 @@
   </section>
 
   <!-- ─── ACADEMY ─── -->
-  <section class="academy" id="academy">
+  <section class="academy" id="academy" data-scroll data-effect="fade" data-base-opacity="0" data-max-opacity="1"
+    data-enter-zone="0.85" data-exit-zone="0.15">
     <div class="container">
       <div class="academy-inner" data-scroll data-effect="fade-up" data-intensity="0.75" data-depth="0.9">
         <div class="academy-text reveal-left" data-scroll data-effect="fade-up" data-intensity="0.85" data-depth="1">
-          <p class="section-label" data-scroll data-effect="fade-up" data-intensity="0.6" data-depth="0.8">Lumière Academy</p>
-          <h2 class="section-title" data-scroll data-effect="fade-up" data-intensity="1" data-depth="1">Train With<br />The <em>Best</em></h2>
-          <p class="academy-desc" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">Whether you're a complete beginner or an experienced artist looking to refine your craft — our academy programmes are designed to unlock your full potential. Learn directly from Sophia and her curated team of expert artists.</p>
+          <p class="section-label" data-scroll data-effect="fade-up" data-intensity="0.6" data-depth="0.8">Lumière
+            Academy</p>
+          <h2 class="section-title" data-scroll data-effect="fade-up" data-intensity="1" data-depth="1">Train
+            With<br />The <em>Best</em></h2>
+          <p class="academy-desc" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">Whether you're a
+            complete beginner or an experienced artist looking to refine your craft — our academy programmes are
+            designed to unlock your full potential. Learn directly from Sophia and her curated team of expert artists.
+          </p>
           <div class="academy-perks" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
             <div class="perk">
               <span class="perk-icon">◈</span>
@@ -369,10 +406,13 @@
           </div>
           <a href="#packages" class="btn-primary">Explore Academy</a>
         </div>
-        <div class="academy-image reveal-right" data-scroll data-effect="parallax" data-intensity="0.8" data-depth="1.1">
-          <img src="training_coaching.png" alt="Lumière Academy training session" class="academy-img" loading="lazy" decoding="async" />
+        <div class="academy-image reveal-right" data-scroll data-effect="parallax" data-intensity="0.8"
+          data-depth="1.1">
+          <img src="training_coaching.png" alt="Lumière Academy training session" class="academy-img" loading="lazy"
+            decoding="async" />
           <div class="academy-quote" data-scroll data-effect="zoom" data-intensity="0.6" data-depth="0.9">
-            <p data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">"She didn't just teach me makeup —<br />she taught me confidence."</p>
+            <p data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">"She didn't just teach me makeup
+              —<br />she taught me confidence."</p>
             <span data-scroll data-effect="fade" data-intensity="0.5" data-depth="1">— Priya M., Artiste Graduate</span>
           </div>
         </div>
@@ -381,137 +421,228 @@
   </section>
 
   <!-- ─── TESTIMONIALS ─── -->
-  <section class="testimonials" id="testimonials">
+  <section class="testimonials" id="testimonials" data-scroll data-effect="fade" data-base-opacity="0"
+    data-max-opacity="1" data-enter-zone="0.85" data-exit-zone="0.15">
     <div class="container">
       <div class="section-header centered">
-        <p class="section-label reveal-up" data-scroll data-effect="fade" data-intensity="0.6" data-depth="0.8">Kind Words</p>
-        <h2 class="section-title reveal-up" data-scroll data-effect="fade-up" data-intensity="1" data-depth="1">Stories of <em>Transformation</em></h2>
+        <p class="section-label reveal-up" data-scroll data-effect="fade" data-intensity="0.6" data-depth="0.8">Kind
+          Words</p>
+        <h2 class="section-title reveal-up" data-scroll data-effect="fade-up" data-intensity="1" data-depth="1">Stories
+          of <em>Transformation</em></h2>
       </div>
-      <div class="testi-track-wrap">
-      <div class="testi-track" id="testiTrack" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="0.9">
-
-          <div class="testi-card">
-            <div class="testi-stars">★★★★★</div>
-            <p class="testi-text">"Sophia made me feel like absolute royalty on my wedding day. The makeup lasted 14 hours and looked flawless in every single photo."</p>
-            <div class="testi-author">
-              <div class="testi-avatar">N</div>
-              <div>
-                <strong>Neha Kapoor</strong>
-                <span>Bridal Atelier Client</span>
-              </div>
+    </div>
+    <!-- Track moved outside container for full-width movement -->
+    <div class="testi-track-wrap">
+      <div class="testi-track" id="testiTrack">
+        <!-- Slide 1 -->
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"Sophia made me feel like absolute royalty on my wedding day. The makeup lasted 14 hours
+            and looked flawless in every single photo."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">N</div>
+            <div>
+              <strong>Neha Kapoor</strong>
+              <span>Bridal Atelier Client</span>
             </div>
           </div>
-
-          <div class="testi-card">
-            <div class="testi-stars">★★★★★</div>
-            <p class="testi-text">"The Artiste training programme completely changed my life. I now run my own bridal studio and book 6 months in advance!"</p>
-            <div class="testi-author">
-              <div class="testi-avatar">R</div>
-              <div>
-                <strong>Riya Sharma</strong>
-                <span>Artiste Graduate</span>
-              </div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"The Artiste training programme completely changed my life. I now run my own bridal
+            studio and book 6 months in advance!"</p>
+          <div class="testi-author">
+            <div class="testi-avatar">R</div>
+            <div>
+              <strong>Riya Sharma</strong>
+              <span>Artiste Graduate</span>
             </div>
           </div>
-
-          <div class="testi-card">
-            <div class="testi-stars">★★★★★</div>
-            <p class="testi-text">"I've visited many artists before but nothing compared to Lumière. The studio is gorgeous and Sophia truly understands what you want."</p>
-            <div class="testi-author">
-              <div class="testi-avatar">A</div>
-              <div>
-                <strong>Anika Verma</strong>
-                <span>Lumière Package Client</span>
-              </div>
+        </div>
+        <!-- Slide 3 -->
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"I've visited many artists before but nothing compared to Lumière. The studio is
+            gorgeous and Sophia truly understands what you want."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">A</div>
+            <div>
+              <strong>Anika Verma</strong>
+              <span>Lumière Package Client</span>
             </div>
           </div>
-
-          <div class="testi-card">
-            <div class="testi-stars">★★★★★</div>
-            <p class="testi-text">"The 1-on-1 coaching was exactly what I needed. Sophia is patient, knowledgeable and genuinely invested in your growth."</p>
-            <div class="testi-author">
-              <div class="testi-avatar">M</div>
-              <div>
-                <strong>Meera Joshi</strong>
-                <span>Coaching Client</span>
-              </div>
+        </div>
+        <!-- Slide 4 -->
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"The 1-on-1 coaching was exactly what I needed. Sophia is patient, knowledgeable and
+            genuinely invested in your growth."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">M</div>
+            <div>
+              <strong>Meera Joshi</strong>
+              <span>Coaching Client</span>
             </div>
           </div>
-
-          <div class="testi-card">
-            <div class="testi-stars">★★★★★</div>
-            <p class="testi-text">"My Éclat makeover was worth every rupee. I walked out feeling 10 years younger and completely in love with myself."</p>
-            <div class="testi-author">
-              <div class="testi-avatar">S</div>
-              <div>
-                <strong>Sana Mirza</strong>
-                <span>Éclat Package Client</span>
-              </div>
+        </div>
+        <!-- Slide 5 -->
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"My Éclat makeover was worth every rupee. I walked out feeling 10 years younger and
+            completely in love with myself."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">S</div>
+            <div>
+              <strong>Sana Mirza</strong>
+              <span>Éclat Package Client</span>
             </div>
           </div>
-
+        </div>
+        <!-- Duplicate for seamless loop -->
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"Sophia made me feel like absolute royalty on my wedding day. The makeup lasted 14 hours
+            and looked flawless in every single photo."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">N</div>
+            <div>
+              <strong>Neha Kapoor</strong>
+              <span>Bridal Atelier Client</span>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"The Artiste training programme completely changed my life. I now run my own bridal
+            studio and book 6 months in advance!"</p>
+          <div class="testi-author">
+            <div class="testi-avatar">R</div>
+            <div>
+              <strong>Riya Sharma</strong>
+              <span>Artiste Graduate</span>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-text">"I've visited many artists before but nothing compared to Lumière. The studio is
+            gorgeous and Sophia truly understands what you want."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">A</div>
+            <div>
+              <strong>Anika Verma</strong>
+              <span>Lumière Package Client</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="testi-dots" id="testiDots" data-scroll data-effect="fade-up" data-intensity="0.5" data-depth="0.9"></div>
     </div>
   </section>
 
   <!-- ─── GALLERY ─── -->
-  <section class="gallery" id="gallery">
+  <section class="gallery" id="gallery" data-scroll data-effect="fade" data-base-opacity="0" data-max-opacity="1"
+    data-enter-zone="0.85" data-exit-zone="0.15">
     <div class="container">
       <div class="section-header centered" data-scroll data-effect="fade-up" data-intensity="0.7" data-depth="0.8">
-        <p class="section-label reveal-up" data-scroll data-effect="fade" data-intensity="0.6" data-depth="0.7">Portfolio</p>
-        <h2 class="section-title reveal-up" data-scroll data-effect="fade-up" data-intensity="1" data-depth="1">A Glimpse Into<br /><em>Our World</em></h2>
-        <p class="section-sub reveal-up" data-scroll data-effect="fade" data-intensity="0.7" data-depth="0.8">Scroll through the images to see the parallax movement and the story behind each frame.</p>
+        <p class="section-label reveal-up" data-scroll data-effect="fade" data-intensity="0.6" data-depth="0.7">
+          Portfolio</p>
+        <h2 class="section-title reveal-up" data-scroll data-effect="fade-up" data-intensity="1" data-depth="1">A
+          Glimpse Into<br /><em>Our World</em></h2>
+        <p class="section-sub reveal-up" data-scroll data-effect="fade" data-intensity="0.7" data-depth="0.8">Scroll
+          through the images to see the parallax movement and the story behind each frame.</p>
       </div>
     </div>
-    <div class="gallery-grid reveal-up" data-scroll data-effect="fade-up" data-intensity="0.8" data-depth="0.8">
-      <div class="gallery-item gallery-item--tall" data-parallax="0.12" data-scroll data-effect="parallax" data-intensity="0.8" data-depth="1">
-        <img src="makeover_portrait.png" alt="Makeover portrait" class="gallery-img" loading="lazy" decoding="async" />
-        <div class="gallery-overlay" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">
-          <span>Full Glam Look</span>
-          <p>Soft contour, radiant skin, and a luminous finish.</p>
+    <div class="gallery-grid">
+      <!-- Row 1: 3 + 9 = 12 -->
+      <div class="gallery-item shape-rect-v" data-scroll data-effect="image-parallax" data-intensity="1.1"
+        data-depth="1" data-enter-zone="0.9">
+        <img src="makeover_portrait.png" alt="Makeover portrait" class="gallery-img" loading="lazy" />
+        <div class="gallery-overlay">
+          <span>Luminous Glow</span>
+          <p>The Signature Edit</p>
         </div>
       </div>
-      <div class="gallery-item" data-parallax="0.08" data-scroll data-effect="parallax" data-intensity="0.65" data-depth="0.9">
-        <img src="makeup_flatlay.png" alt="Makeup collection" class="gallery-img" loading="lazy" decoding="async" />
-        <div class="gallery-overlay" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
-          <span>Our Palette</span>
-          <p>Every shade is selected to feel balanced and bespoke.</p>
+      <div class="gallery-item shape-wide" data-scroll data-effect="image-parallax" data-intensity="1.4"
+        data-depth="1.2" data-enter-zone="0.8">
+        <img src="training_coaching.png" alt="Training" class="gallery-img" loading="lazy" />
+        <div class="gallery-overlay">
+          <span>The Artiste</span>
+          <p>Academy Training</p>
         </div>
       </div>
-      <div class="gallery-item" data-parallax="0.14" data-scroll data-effect="parallax" data-intensity="0.75" data-depth="1">
-        <img src="training_coaching.png" alt="Training session" class="gallery-img" loading="lazy" decoding="async" />
-        <div class="gallery-overlay" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">
-          <span>Academy Session</span>
-          <p>Hands-on mentoring for artists building confidence and craft.</p>
+
+      <!-- Row 2: 3 + 9 = 12 -->
+      <div class="gallery-item shape-circle" data-scroll data-effect="image-parallax" data-intensity="0.9"
+        data-depth="0.9" data-enter-zone="0.85">
+        <img src="makeup_flatlay.png" alt="Makeup collection" class="gallery-img" loading="lazy" />
+        <div class="gallery-overlay">
+          <span>Bespoke</span>
+          <p>Curated Palettes</p>
         </div>
       </div>
-      <div class="gallery-item gallery-item--wide" data-parallax="0.1" data-scroll data-effect="parallax" data-intensity="0.7" data-depth="0.9">
-        <img src="salon_hero.png" alt="Lumière Studio" class="gallery-img" loading="lazy" decoding="async" />
-        <div class="gallery-overlay" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
-          <span>The Studio</span>
-          <p>Warm light, calm surfaces, and a room designed to slow time.</p>
+      <div class="gallery-item shape-wide" data-scroll data-effect="image-parallax" data-intensity="0.8"
+        data-depth="1.3" data-enter-zone="0.75">
+        <img src="salon_hero.png" alt="Studio" class="gallery-img" loading="lazy" />
+        <div class="gallery-overlay">
+          <span>Lumière Studio</span>
+          <p>Sanctuary of Style</p>
         </div>
       </div>
-      <div class="gallery-item" data-parallax="0.06" data-scroll data-effect="parallax" data-intensity="0.55" data-depth="0.9">
-        <img src="packages_bg.png" alt="Spa packages" class="gallery-img" loading="lazy" decoding="async" />
-        <div class="gallery-overlay" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
-          <span>Our Ritual</span>
-          <p>Skincare-first preparation for long-lasting makeup wear.</p>
+
+      <!-- Row 3: 6 + 3 + 3 = 12 -->
+      <div class="gallery-item shape-pill" data-scroll data-effect="image-parallax" data-intensity="1.3" data-depth="1"
+        data-enter-zone="0.7">
+        <img src="packages_bg.png" alt="Spa" class="gallery-img" loading="lazy" />
+        <div class="gallery-overlay">
+          <span>Rituals</span>
+          <p>Skincare first</p>
+        </div>
+      </div>
+      <div class="gallery-item shape-square" data-scroll data-effect="image-parallax" data-intensity="1.8"
+        data-depth="1.4" data-enter-zone="0.65">
+        <img src="makeover_portrait.png" alt="Portrait" class="gallery-img" loading="lazy" />
+        <div class="gallery-overlay">
+          <span>Ethereal</span>
+          <p>Morning Glow</p>
+        </div>
+      </div>
+      <div class="gallery-item shape-circle" data-scroll data-effect="image-parallax" data-intensity="2.2"
+        data-depth="1.5" data-enter-zone="0.55">
+        <img src="makeup_flatlay.png" alt="Makeup" class="gallery-img" loading="lazy" />
+      </div>
+
+      <!-- Row 4: 3 + 9 = 12 (Signature pill at bottom) -->
+      <div class="gallery-item shape-rect-v" data-scroll data-effect="image-parallax" data-intensity="1.1"
+        data-depth="1.2" data-enter-zone="0.6">
+        <img src="training_coaching.png" alt="Detail" class="gallery-img" loading="lazy" />
+        <div class="gallery-overlay">
+          <span>Precision</span>
+          <p>The Masterclass</p>
+        </div>
+      </div>
+      <div class="gallery-item shape-quote gallery-text-tile" data-scroll data-effect="fade-up" data-intensity="0.7"
+        data-enter-zone="0.3">
+        <div class="text-tile-content">
+          <p class="quote">"Beauty is not about masks, but about revealing the light that already lives within."</p>
+          <div class="signature">Sophia Lumière</div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ─── CONTACT ─── -->
-  <section class="contact" id="contact">
+  <section class="contact" id="contact" data-scroll data-effect="fade" data-base-opacity="0" data-max-opacity="1"
+    data-enter-zone="0.85" data-exit-zone="0.15">
     <div class="container">
       <div class="contact-inner" data-scroll data-effect="fade-up" data-intensity="0.75" data-depth="0.9">
         <div class="contact-text reveal-left" data-scroll data-effect="fade-up" data-intensity="0.85" data-depth="1">
           <p class="section-label" data-scroll data-effect="fade" data-intensity="0.6" data-depth="0.9">Get In Touch</p>
-          <h2 class="section-title" data-scroll data-effect="fade-up" data-intensity="1" data-depth="1"><span class="contact-title-accent">Begin Your</span><br /><em>Transformation</em></h2>
-          <p class="contact-desc" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">Ready to experience Lumière? Whether you'd like to book a service, enquire about our academy, or simply say hello — we'd love to hear from you.</p>
+          <h2 class="section-title" data-scroll data-effect="fade-up" data-intensity="1" data-depth="1"><span
+              class="contact-title-accent">Begin Your</span><br /><em>Transformation</em></h2>
+          <p class="contact-desc" data-scroll data-effect="fade" data-intensity="0.7" data-depth="1">Ready to experience
+            Lumière? Whether you'd like to book a service, enquire about our academy, or simply say hello — we'd love to
+            hear from you.</p>
           <div class="contact-details">
             <div class="contact-item">
               <span class="contact-icon">✦</span>
@@ -536,24 +667,30 @@
             </div>
           </div>
         </div>
-        <div class="contact-form-wrap reveal-right" data-scroll data-effect="zoom" data-intensity="0.65" data-depth="0.9">
-          <form class="contact-form" id="contactForm" novalidate data-scroll data-effect="fade-up" data-intensity="0.75" data-depth="1">
+        <div class="contact-form-wrap reveal-right" data-scroll data-effect="zoom" data-intensity="0.65"
+          data-depth="0.9">
+          <form class="contact-form" id="contactForm" novalidate data-scroll data-effect="fade-up" data-intensity="0.75"
+            data-depth="1">
             <div class="form-row" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
               <div class="form-group">
-                <label for="firstName" data-scroll data-effect="fade" data-intensity="0.4" data-depth="1">First Name</label>
+                <label for="firstName" data-scroll data-effect="fade" data-intensity="0.4" data-depth="1">First
+                  Name</label>
                 <input type="text" id="firstName" name="firstName" placeholder="Sophie" required />
               </div>
               <div class="form-group">
-                <label for="lastName" data-scroll data-effect="fade" data-intensity="0.4" data-depth="1">Last Name</label>
+                <label for="lastName" data-scroll data-effect="fade" data-intensity="0.4" data-depth="1">Last
+                  Name</label>
                 <input type="text" id="lastName" name="lastName" placeholder="Laurent" required />
               </div>
             </div>
             <div class="form-group">
-              <label for="email" data-scroll data-effect="fade" data-intensity="0.4" data-depth="1">Email Address</label>
+              <label for="email" data-scroll data-effect="fade" data-intensity="0.4" data-depth="1">Email
+                Address</label>
               <input type="email" id="email" name="email" placeholder="hello@youremail.com" required />
             </div>
             <div class="form-group" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
-              <label for="service" data-scroll data-effect="fade" data-intensity="0.4" data-depth="1">Service of Interest</label>
+              <label for="service" data-scroll data-effect="fade" data-intensity="0.4" data-depth="1">Service of
+                Interest</label>
               <select id="service" name="service" data-scroll data-effect="fade" data-intensity="0.4" data-depth="1">
                 <option value="">Select a service…</option>
                 <option>Makeup Artistry</option>
@@ -565,10 +702,13 @@
               </select>
             </div>
             <div class="form-group" data-scroll data-effect="fade" data-intensity="0.6" data-depth="1">
-              <label for="message" data-scroll data-effect="fade" data-intensity="0.4" data-depth="1">Your Message</label>
-              <textarea id="message" name="message" rows="4" placeholder="Tell us about your vision…" data-scroll data-effect="fade" data-intensity="0.4" data-depth="1"></textarea>
+              <label for="message" data-scroll data-effect="fade" data-intensity="0.4" data-depth="1">Your
+                Message</label>
+              <textarea id="message" name="message" rows="4" placeholder="Tell us about your vision…" data-scroll
+                data-effect="fade" data-intensity="0.4" data-depth="1"></textarea>
             </div>
-            <button type="submit" class="btn-contact" id="submitBtn" data-scroll data-effect="zoom" data-intensity="0.45" data-depth="0.9">Send Message</button>
+            <button type="submit" class="btn-contact" id="submitBtn" data-scroll data-effect="zoom"
+              data-intensity="0.45" data-depth="0.9">Send Message</button>
             <div class="form-success hidden" id="formSuccess">
               <span>✦</span> Thank you, darling. We'll be in touch very soon.
             </div>
@@ -585,7 +725,6 @@
         <div class="footer-brand">
           <span class="logo-script">Lumière</span>
           <span class="logo-sub">STUDIO</span>
-          <div class="footer-signature">S</div>
           <p>Where beauty becomes art.<br />Mumbai's most loved luxury studio.</p>
         </div>
         <div class="footer-links">
@@ -616,6 +755,7 @@
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
+
 </html>
