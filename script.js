@@ -193,121 +193,85 @@ window.addEventListener('resize', () => {
 }, { passive: true });
 
 
-// ── Custom Cursor — single dot, expands on interactive elements ──
-const cursor = document.getElementById('cursor');
-let lastPetalTime = 0;
-let lastX = 0, lastY = 0;
-let cursorIdleTimeout;
-let isCursorVisible = true;
-
-// Detect touch/coarse pointer or reduced motion — disable custom cursor
-const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
-const shouldDisableCursor = hasCoarsePointer || prefersReducedMotion;
-
-if (!shouldDisableCursor) {
-  document.addEventListener('mousemove', e => {
-    cursor.style.setProperty('--x', e.clientX + 'px');
-    cursor.style.setProperty('--y', e.clientY + 'px');
-    
-    // Show cursor if it was hidden
-    if (!isCursorVisible) {
-      cursor.style.opacity = '0.9';
-      isCursorVisible = true;
-    }
-    
-    // Clear existing idle timeout
-    clearTimeout(cursorIdleTimeout);
-    
-    const now = Date.now();
-    const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
-    
-    // Refined flow: trigger by time AND distance for a smooth stream
-    if (now - lastPetalTime > 50 && dist > 12) { 
-      createPetal(e.clientX, e.clientY);
-      lastPetalTime = now;
-      lastX = e.clientX;
-      lastY = e.clientY;
-    }
-    
-    // Fade out cursor after 2 seconds of inactivity (like macOS)
-    cursorIdleTimeout = setTimeout(() => {
-      cursor.style.opacity = '0.3';
-      isCursorVisible = false;
-    }, 2000);
-  }, { passive: true });
-  
-  // Show cursor on mouse enter from outside
-  document.addEventListener('mouseenter', () => {
-    cursor.style.opacity = '0.9';
-    isCursorVisible = true;
-  });
-  
-  // Hide cursor when leaving window
-  document.addEventListener('mouseleave', () => {
-    cursor.style.opacity = '0';
-    isCursorVisible = false;
-  });
-} else {
-  // Hide custom cursor on touch devices or when reduced motion is preferred
-  cursor.style.display = 'none';
-}
-
-function createPetal(x, y) {
-  if (prefersReducedMotion) return;
-  const petal = document.createElement('div');
-  petal.className = 'cursor-petal';
-  const size = Math.random() * 8 + 4;
-  const colors = ['var(--blush)', 'var(--rose)', 'var(--mauve)', 'var(--gold)', 'rgba(255,255,255,0.8)'];
-  
-  petal.style.width = size + 'px';
-  petal.style.height = size + 'px';
-  petal.style.background = colors[Math.floor(Math.random() * colors.length)];
-  petal.style.left = x + 'px';
-  petal.style.top = y + 'px';
-  
-  // Random horizontal drift for organic flow
-  const drift = (Math.random() - 0.5) * 50;
-  petal.style.setProperty('--drift', drift + 'px');
-  petal.style.zIndex = '9998';
-  petal.style.animation = `fallPetal ${Math.random() * 1.5 + 1}s cubic-bezier(.2,.5,.3,1) forwards`;
-  
-  document.body.appendChild(petal);
-  setTimeout(() => petal.remove(), 2500);
-}
-
-// Expand dot on any interactive element (CTAs, links, buttons, cards)
-const interactiveEls = 'a, button, .pkg-tab, .testi-dot, .gallery-item, .nav-link, .service-card, .pkg-card, .contact-item, input, select, textarea';
-document.querySelectorAll(interactiveEls).forEach(el => {
-  el.addEventListener('mouseenter', () => cursor.classList.add('is-hovering'));
-  el.addEventListener('mouseleave', () => cursor.classList.remove('is-hovering'));
-});
+// ── Custom Cursor (disabled) ──
+// Feedback: remove the custom cursor dot.
+// Keeping code removed to avoid runtime overhead and visual artifacts.
 
 
 
 
-// ── Sticky Nav ──
+
+// ── Refined Nav Logic: Hide on Scroll, Minimal Button on Stop ──
 const nav = document.getElementById('nav');
-let lastScrollTop = 0;
-let scrollTimeout;
+const burger = document.getElementById('navBurger');
 
-window.addEventListener('scroll', () => {
-  let currentScroll = window.scrollY;
-  if (currentScroll > 60) {
-    nav.style.transform = currentScroll > lastScrollTop ? 'translateY(-100%)' : 'translateY(0)';
-  } else {
-    nav.style.transform = 'translateY(0)';
+// Debounced “scroll end” detection so:
+// - header hides immediately while scrolling
+// - burger (minimal state) appears only after scrolling stops
+let scrollTimeout = null;
+let isScrolling = false;
+
+const SHOW_AT = 60; // matches existing CSS logic
+const SCROLL_END_DELAY = 250; // how long without scroll before showing burger
+
+const setFullNav = () => {
+  nav.classList.remove('minimal');
+  nav.classList.add('scrolled');
+  nav.style.transform = 'translateY(0)';
+};
+
+const setMinimalNav = () => {
+  // Ensure minimal burger is visible when scrolling stops
+  nav.classList.add('minimal');
+  nav.classList.add('scrolled');
+  nav.style.transform = 'translateY(0)';
+};
+
+const hideFullNavWhileScrolling = () => {
+  if (window.scrollY > SHOW_AT) {
+    // Immediately hide header while scrolling
+    nav.classList.remove('minimal');
+    nav.style.transform = 'translateY(-100%)';
+    nav.classList.add('scrolled');
   }
-  lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+};
+
+const updateNav = () => {
+  const currentScroll = window.scrollY;
+
+  // At top: full nav restored
+  if (currentScroll <= SHOW_AT) {
+    isScrolling = false;
+    clearTimeout(scrollTimeout);
+    scrollTimeout = null;
+    nav.classList.remove('scrolled', 'minimal');
+    nav.style.transform = 'translateY(0)';
+    return;
+  }
+
+  // While scrolling: hide full header
+  if (!isScrolling) isScrolling = true;
+  hideFullNavWhileScrolling();
+
+  // Scroll end debounce
   clearTimeout(scrollTimeout);
   scrollTimeout = setTimeout(() => {
-    if (currentScroll > 60) nav.style.transform = 'translateY(0)';
-  }, 800);
-  nav.classList.toggle('scrolled', currentScroll > 60);
-});
+    isScrolling = false;
+    setFullNav();
+  }, SCROLL_END_DELAY);
+};
+
+if (lenis) {
+  lenis.on('scroll', updateNav);
+} else {
+  window.addEventListener('scroll', updateNav, { passive: true });
+}
+
+// In case page loads mid-scroll
+updateNav();
 
 // ── High-End Full Screen Polka Dot Menu ──
 const fsMenu = document.getElementById('fsMenu');
-const burger = document.getElementById('navBurger');
 const menuDots = document.querySelectorAll('.menu-dot');
 
 burger.addEventListener('click', () => {
@@ -336,22 +300,6 @@ burger.addEventListener('click', () => {
     });
   }
 });
-
-// Dynamic Burger Visibility: Hide on Scroll, Show on Stop
-if (lenis) {
-  lenis.on('scroll', () => {
-    // Only apply if not already hidden by the nav-bar logic
-    burger.classList.add('nav-hidden');
-    
-    // Clear and reset the existing scrollTimeout (from line 217)
-    clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(() => {
-      burger.classList.remove('nav-hidden');
-      // Also ensure the whole nav is visible if we've stopped
-      if (window.scrollY > 60) nav.style.transform = 'translateY(0)';
-    }, 450); // Snappy 450ms reveal
-  });
-}
 
 // Close menu on link click, close button, or Escape
 const closeBtn = document.getElementById('fsMenuClose');
